@@ -19,8 +19,8 @@ DTYPE = torch.float32
 # ENVIRONMENT_NAME = "PTLG-v0"
 # RENDER_MODE = None
 #ENVIRONMENT_NAME = "MountainCar-v0"
-#ENVIRONMENT_NAME = "LunarLander-v2"
-ENVIRONMENT_NAME = 'CartPole-v1'
+ENVIRONMENT_NAME = "LunarLander-v2"
+#ENVIRONMENT_NAME = 'CartPole-v1'
 #~~ TEST ENVS
 
 # HYPERPARAMETER LAND
@@ -166,11 +166,11 @@ if __name__ == '__main__':
 
         #reward to go
         discounts = np.power(DISCOUNT_FACTOR, np.arange(len(rews)))
-        #rtgs=[np.sum(rews[i:] * discounts[:len(rews)-i]) for i in range(len(rews))]
-        #rtgs = rtgs / (np.std(rtgs)+1e-8)
+        rtgs=[np.sum(rews[i:] * discounts[:len(rews)-i]) for i in range(len(rews))]
+        rtgs = rtgs / (np.std(rtgs)+1e-8)
         #rtgs = np.clip(rtgs, -10, 10)
-        #Rn += rtgs.tolist()
-        Rn += [np.sum(rews[i:] * discounts[:len(rews)-i]) for i in range(len(rews))]
+        Rn += rtgs.tolist()
+        #Rn += [np.sum(rews[i:] * discounts[:len(rews)-i]) for i in range(len(rews))]
         
         Xn, An, Rn = Xn[-MAX_REPLAY_BUFFER:],An[-MAX_REPLAY_BUFFER:],Rn[-MAX_REPLAY_BUFFER:]
         old_logs = old_logs[-MAX_REPLAY_BUFFER:]
