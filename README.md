@@ -6,7 +6,7 @@ Welcome to a simple straighforward Reinforcement learning solution for various p
 
 ## Overview
 
-- 'ppo_generic.py' : The backbone that runs the whole process. Can be fine tuned.
+- `ppo_generic.py` : The backbone that runs the whole process. Can be fine tuned.
 
 ## Prerequisites
 
