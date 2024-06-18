@@ -1,4 +1,3 @@
-#from typing import Tuple
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
@@ -6,13 +5,11 @@ import time
 import gymnasium as gym
 from tqdm import trange
 import numpy as np
-
 import torch
 from torch import nn
 from torch.optim import Adam
 
 DTYPE = torch.float32
-#RENDER_MODE = 'human'
 
 ### TEST ENVS
 # import press_the_light
@@ -54,8 +51,6 @@ class Agent(nn.Module):
         self.final_activation = final_activation
 
     def forward(self,obs:torch.Tensor):
-
-        # Actor
         x = self.activation(self.l1(obs))
         x = self.activation(self.l2(x))
         #x = x[:,-1,:]
@@ -167,9 +162,12 @@ if __name__ == '__main__':
         #reward to go
         discounts = np.power(DISCOUNT_FACTOR, np.arange(len(rews)))
         rtgs=[np.sum(rews[i:] * discounts[:len(rews)-i]) for i in range(len(rews))]
+        # Reward scaling
         rtgs = rtgs / (np.std(rtgs)+1e-8)
+        # Reward clipping
         #rtgs = np.clip(rtgs, -10, 10)
         Rn += rtgs.tolist()
+        # No reward scalingcliping | Comment the above code and uncomment below
         #Rn += [np.sum(rews[i:] * discounts[:len(rews)-i]) for i in range(len(rews))]
         
         Xn, An, Rn = Xn[-MAX_REPLAY_BUFFER:],An[-MAX_REPLAY_BUFFER:],Rn[-MAX_REPLAY_BUFFER:]
