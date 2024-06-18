@@ -1,6 +1,5 @@
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-
 import time
 import gymnasium as gym
 from tqdm import trange
@@ -8,25 +7,23 @@ import numpy as np
 import torch
 from torch import nn
 from torch.optim import Adam
-
 DTYPE = torch.float32
 
-### TEST ENVS
+### ENVIRONMENT_NAME # DEFINE YOUR ENVIRONMENT HERE
 # import press_the_light
 # ENVIRONMENT_NAME = "PTLG-v0"
 # RENDER_MODE = None
-#ENVIRONMENT_NAME = "MountainCar-v0"
-ENVIRONMENT_NAME = "LunarLander-v2"
-#ENVIRONMENT_NAME = 'CartPole-v1'
-#~~ TEST ENVS
+#ENVIRONMENT_NAME = "LunarLander-v2"
+ENVIRONMENT_NAME = 'CartPole-v1'
+#~~
 
 # HYPERPARAMETER LAND
 plot = 0
 PLOT_INTERVAL=20
 BS = 512
 MAX_REPLAY_BUFFER = 4000
-HIDDEN_STATE_SZ = 32
-EPISODES = 500
+HIDDEN_STATE_SZ = 256
+EPISODES = 200
 LEARNING_RATE= 3e-3
 VALUE_SCALE = 1
 ENTROPY_SCALE = 0.001 #0.001 #
@@ -34,7 +31,7 @@ DISCOUNT_FACTOR = 0.99
 TRAIN_STEPS=5
 PPO_EPSILON=0.2
 APPROX_KL_THRESHOLD_BREAK=0.2
-
+#~~
 
 class Agent(nn.Module):
     def __init__(self, in_features:int, out_features:int, hidden_state:int=HIDDEN_STATE_SZ,final_activation:bool=False):
@@ -43,21 +40,16 @@ class Agent(nn.Module):
         self.l2 = nn.Linear(hidden_state,hidden_state)
         self.l3 = nn.Linear(hidden_state,out_features)
 
-        self.c1 = nn.Linear(in_features,hidden_state)
-        self.c2 = nn.Linear(hidden_state,hidden_state)
-        self.c3 = nn.Linear(hidden_state,1)
-
         self.activation = nn.GELU()
         self.final_activation = final_activation
 
     def forward(self,obs:torch.Tensor):
         x = self.activation(self.l1(obs))
         x = self.activation(self.l2(x))
-        #x = x[:,-1,:]
         x = self.l3(x)
         
-        if self.final_activation:
-            return x.log_softmax(dim=-1)#
+        if self.final_activation: # for critic use
+            return x.log_softmax(dim=-1)
         return x
 
 
@@ -77,9 +69,9 @@ if __name__ == '__main__':
     obs_shape = env.unwrapped.observation_space.shape[0]
     act_shape = int(env.action_space.n)
 
+    # Define Agents Actor/Critic
     actor  = Agent(obs_shape,act_shape, HIDDEN_STATE_SZ,final_activation=True)
     critic = Agent(obs_shape,1, HIDDEN_STATE_SZ)
-
     actor_opt = Adam(actor.parameters(), lr=LEARNING_RATE)
     critic_opt = Adam(critic.parameters(), lr=LEARNING_RATE)
 
@@ -157,7 +149,7 @@ if __name__ == '__main__':
         # For plot/misc
         reward_print = np.sum(rews)
         returns.append(reward_print)#(sum(rews))
-        episode_lengths.append(len(rews)/700)
+        episode_lengths.append(len(rews))
 
         #reward to go
         discounts = np.power(DISCOUNT_FACTOR, np.arange(len(rews)))
