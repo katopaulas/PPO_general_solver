@@ -30,3 +30,9 @@ Welcome to a simple straighforward Reinforcement learning solution for various p
 	- `APPROX_KL_THRESHOLD_BREAK`: KL threshold to interrupt train (above the threshold our past policy deviates a lot from the current)
 
 ## Usage
+
+To run the script, execute the following command:
+
+```bash
+python ppo_generic.py
+```
