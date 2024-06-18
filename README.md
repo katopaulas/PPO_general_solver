@@ -11,6 +11,7 @@ Welcome to a simple straighforward Reinforcement learning solution for various p
 ## Prerequisites
 
 ## Parameters/Hyperparameters
+
 1. Parameters
 
 	- `ENVIRONMENT_NAME`: The custom or AIGYM environment (For custom environments register is recommended)
